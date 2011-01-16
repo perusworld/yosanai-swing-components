@@ -25,6 +25,7 @@ package com.yosanai.java.swing.config;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.security.Security;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,6 +35,7 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
 
 /**
@@ -41,6 +43,11 @@ import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
  * @author Saravana Perumal Shanmugam
  */
 public class ConfigDialog extends javax.swing.JDialog {
+    /**
+     * 
+     */
+    private static final String DEFAULT_ALGORITHM = "PBEWITHSHA256AND128BITAES-CBC-BC";
+
     /** A return status code - returned if Cancel button has been pressed */
     public static final int RET_CANCEL = 0;
 
@@ -81,6 +88,10 @@ public class ConfigDialog extends javax.swing.JDialog {
         if (null == configuration) {
             ConfigPasswordDialog dialog = new ConfigPasswordDialog(null, true);
             StandardPBEStringEncryptor encryptor = new StandardPBEStringEncryptor();
+            if (null == Security.getProvider(BouncyCastleProvider.PROVIDER_NAME)) {
+                Security.addProvider(new BouncyCastleProvider());
+            }
+            encryptor.setAlgorithm(DEFAULT_ALGORITHM);
             dialog.setEncryptor(encryptor);
             dialog.setVisible(true);
             if (ConfigPasswordDialog.RET_OK == dialog.getReturnStatus()) {

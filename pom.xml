@@ -81,6 +81,11 @@
 			<artifactId>junit</artifactId>
 			<version>4.8.2</version>
 		</dependency>
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcprov-jdk16</artifactId>
+			<version>1.45</version>
+		</dependency>
 	</dependencies>
 	<properties>
 		<skip.tests>true</skip.tests>
