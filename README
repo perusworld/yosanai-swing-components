@@ -1,0 +1,8 @@
+Yosanai Swing Components
+
+Some reusable swing components
+
+1. com.yosanai.java.swing.config.ConfigDialog
+   A simple dialog used to configure and save application configuration files securely.
+   It stores key/values in an xml file, where in the values are encryted and stored using a password provided by the user at runtime.
+
