@@ -24,6 +24,12 @@
 			</roles>
 		</developer>
 	</developers>
+	<distributionManagement>
+		<repository>
+			<id>repository</id>
+			<url>file://repo</url>
+		</repository>
+	</distributionManagement>
 	<scm>
 		<developerConnection>Saravana Perumal Shanmugam</developerConnection>
 		<url>https://perusworld@github.com/perusworld/yosanai-swing-components.git</url>
