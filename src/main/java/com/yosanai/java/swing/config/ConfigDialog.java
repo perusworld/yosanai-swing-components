@@ -89,7 +89,7 @@ public class ConfigDialog extends javax.swing.JDialog {
             ConfigPasswordDialog dialog = new ConfigPasswordDialog(null, true);
             StandardPBEStringEncryptor encryptor = new StandardPBEStringEncryptor();
             if (null == Security.getProvider(BouncyCastleProvider.PROVIDER_NAME)) {
-                Security.addProvider(new BouncyCastleProvider());
+                Security.insertProviderAt(new BouncyCastleProvider(), 1);
             }
             encryptor.setAlgorithm(DEFAULT_ALGORITHM);
             dialog.setEncryptor(encryptor);
