@@ -1,6 +1,6 @@
 Yosanai Swing Components
 
-Some reusable swing components
+Some reusable swing components. If you are using maven, you can include this library in your project using https://github.com/perusworld/maven-repo (more details here)
 
 1. com.yosanai.java.swing.config.ConfigDialog
    A simple dialog used to configure and save application configuration files securely.
