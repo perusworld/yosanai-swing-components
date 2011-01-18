@@ -41,11 +41,11 @@ public class ConfigDialogTest extends javax.swing.JFrame {
     }
 
     protected void showConfig() {
-        ConfigDialog dialog = new ConfigDialog(this, true);
+        FileBackedConfigDialog dialog = new FileBackedConfigDialog(this, true);
         dialog.setFile(".configDialogTest");
         dialog.init("a.a", "a.b", "a.c", "b.b", "a.d");
         dialog.setVisible(true);
-        if (ConfigDialog.RET_OK == dialog.getReturnStatus()) {
+        if (FileBackedConfigDialog.RET_OK == dialog.getReturnStatus()) {
             try {
                 dialog.getConfiguration().save();
             } catch (ConfigurationException ex) {

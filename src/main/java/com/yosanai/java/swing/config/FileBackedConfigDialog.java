@@ -22,24 +22,44 @@
 
 package com.yosanai.java.swing.config;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.security.Security;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.table.DefaultTableModel;
+
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.XMLConfiguration;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
 
 /**
  * 
  * @author Saravana Perumal Shanmugam
  */
-public class ConfigDialog extends javax.swing.JDialog {
+public class FileBackedConfigDialog extends javax.swing.JDialog {
+    /**
+     * 
+     */
+    private static final String DEFAULT_ALGORITHM = "PBEWITHSHA256AND128BITAES-CBC-BC";
+
     /** A return status code - returned if Cancel button has been pressed */
     public static final int RET_CANCEL = 0;
 
     /** A return status code - returned if OK button has been pressed */
     public static final int RET_OK = 1;
 
-    /** Creates new form ConfigDialog */
-    public ConfigDialog(java.awt.Frame parent, boolean modal) {
+    protected String file;
+
+    protected XMLConfiguration configuration;
+
+    /** Creates new form FileBackedConfigDialog */
+    public FileBackedConfigDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
     }
@@ -49,22 +69,79 @@ public class ConfigDialog extends javax.swing.JDialog {
         return returnStatus;
     }
 
-    public void loadConfig(Map<String, String> config) {
+    /**
+     * @param file
+     *            the file to set
+     */
+    public void setFile(String file) {
+        this.file = file;
+    }
+
+    /**
+     * @return the configuration
+     */
+    public XMLConfiguration getConfiguration() {
+        return configuration;
+    }
+
+    public void init(String... keys) {
+        if (null == configuration) {
+            ConfigPasswordDialog dialog = new ConfigPasswordDialog(null, true);
+            StandardPBEStringEncryptor encryptor = new StandardPBEStringEncryptor();
+            if (null == Security.getProvider(BouncyCastleProvider.PROVIDER_NAME)) {
+                Security.insertProviderAt(new BouncyCastleProvider(), 1);
+            }
+            encryptor.setAlgorithm(DEFAULT_ALGORITHM);
+            dialog.setEncryptor(encryptor);
+            dialog.setVisible(true);
+            if (ConfigPasswordDialog.RET_OK == dialog.getReturnStatus()) {
+                try {
+                    configuration = new EncryptedXMLConfiguration(encryptor);
+                    configuration.setFileName(file);
+                    configuration.load(file);
+                } catch (ConfigurationException e) {
+                    try {
+                        String defaultPath = System.getProperty("user.home") + "/" + file;
+                        new File(defaultPath).createNewFile();
+                        FileInputStream ins = new FileInputStream(defaultPath);
+                        String entries = IOUtils.toString(ins);
+                        IOUtils.closeQuietly(ins);
+                        if (StringUtils.isBlank(entries)) {
+                            configuration = new EncryptedXMLConfiguration(encryptor);
+                            configuration.setFileName(defaultPath);
+                            try {
+                                configuration.save();
+                            } catch (ConfigurationException cfEx) {
+                                Logger.getLogger(FileBackedConfigDialog.class.getName()).log(Level.SEVERE, null, cfEx);
+                            }
+                        }
+                    } catch (IOException ioEx) {
+                        Logger.getLogger(FileBackedConfigDialog.class.getName()).log(Level.SEVERE, null, ioEx);
+                    }
+                }
+            }
+        }
+        if (null != configuration) {
+            configuration.setAutoSave(true);
+            load(keys);
+        }
+    }
+
+    protected void load(String... keys) {
         DefaultTableModel model = (DefaultTableModel) tblConfig.getModel();
         while (0 < model.getRowCount()) {
             model.removeRow(0);
         }
-        for (String key : config.keySet()) {
-            model.addRow(new Object[] { key, (null == config.get(key) ? "" : config.get(key)) });
+        for (String key : keys) {
+            model.addRow(new Object[] { key, configuration.getString(key, "") });
         }
     }
 
-    public Map<String, String> getConfig() {
-        Map<String, String> ret = new LinkedHashMap<String, String>();
+    protected void updateConfig() {
         for (int index = 0; index < tblConfig.getRowCount(); index++) {
-            ret.put(tblConfig.getValueAt(index, 0).toString(), tblConfig.getValueAt(index, 1).toString());
+            configuration.setProperty(tblConfig.getValueAt(index, 0).toString(), tblConfig.getValueAt(index, 1)
+                    .toString());
         }
-        return ret;
     }
 
     /**
@@ -74,7 +151,7 @@ public class ConfigDialog extends javax.swing.JDialog {
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed"
-    // desc="Generated Code">//GEN-BEGIN:initComponents
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         pnlBottom = new javax.swing.JPanel();
@@ -112,19 +189,27 @@ public class ConfigDialog extends javax.swing.JDialog {
 
         pnlTop.setLayout(new java.awt.BorderLayout());
 
-        tblConfig.setModel(new javax.swing.table.DefaultTableModel(new Object[][] {
+        tblConfig.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
 
-        }, new String[] { "Key", "Value" }) {
-            Class[] types = new Class[] { java.lang.String.class, java.lang.String.class };
-
-            boolean[] canEdit = new boolean[] { false, true };
+            },
+            new String [] {
+                "Key", "Value"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, true
+            };
 
             public Class getColumnClass(int columnIndex) {
-                return types[columnIndex];
+                return types [columnIndex];
             }
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit[columnIndex];
+                return canEdit [columnIndex];
             }
         });
         scrConfig.setViewportView(tblConfig);
@@ -142,6 +227,7 @@ public class ConfigDialog extends javax.swing.JDialog {
     }// GEN-LAST:event_closeDialog
 
     private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_okButtonActionPerformed
+        updateConfig();
         doClose(RET_OK);
     }// GEN-LAST:event_okButtonActionPerformed
 
@@ -162,7 +248,7 @@ public class ConfigDialog extends javax.swing.JDialog {
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                ConfigDialog dialog = new ConfigDialog(new javax.swing.JFrame(), true);
+                FileBackedConfigDialog dialog = new FileBackedConfigDialog(new javax.swing.JFrame(), true);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     public void windowClosing(java.awt.event.WindowEvent e) {
                         System.exit(0);
@@ -175,17 +261,11 @@ public class ConfigDialog extends javax.swing.JDialog {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;
-
     private javax.swing.JButton okButton;
-
     private javax.swing.JPanel pnlBottom;
-
     private javax.swing.JPanel pnlTop;
-
     private javax.swing.JScrollPane scrConfig;
-
     private javax.swing.JTable tblConfig;
-
     // End of variables declaration//GEN-END:variables
 
     private int returnStatus = RET_CANCEL;
