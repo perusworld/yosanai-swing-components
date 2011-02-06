@@ -6,6 +6,8 @@ Some reusable swing components. If you are using maven, you can include this lib
    A simple dialog used to configure settings.
 2. com.yosanai.java.swing.config.FileBackedConfigDialog
    A simple dialog used to configure and save application configuration files securely.
-   It stores key/values in an xml file, where in the values are encryted and stored using a password provided by the user at runtime.
+   It stores key/values in an xml file, where in the values are encrypted and stored using a password provided by the user at runtime.
    NOTE: This uses http://www.bouncycastle.org/ encryption libraries and also requires Java Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files (http://www.oracle.com/technetwork/java/javase/downloads/index.html#other) to be installed
-   
+3. com.yosanai.java.swing.editor.ObjectEditorTableModel
+   Table editor that loads the properties(including nested) of a given object into a TableModel. This can then be set to a JTable
+    
