@@ -22,7 +22,6 @@
 
 package com.yosanai.java.swing.config;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.swing.table.DefaultTableModel;
@@ -96,21 +95,11 @@ public class ConfigDialog extends javax.swing.JDialog {
     }
 
     public void loadConfig(Map<String, String> config) {
-        DefaultTableModel model = (DefaultTableModel) tblConfig.getModel();
-        while (0 < model.getRowCount()) {
-            model.removeRow(0);
-        }
-        for (String key : config.keySet()) {
-            model.addRow(new Object[] { key, (null == config.get(key) ? "" : config.get(key)) });
-        }
+        cfgPanel.loadConfig(config);
     }
 
     public Map<String, String> getConfig() {
-        Map<String, String> ret = new LinkedHashMap<String, String>();
-        for (int index = 0; index < tblConfig.getRowCount(); index++) {
-            ret.put(tblConfig.getValueAt(index, 0).toString(), tblConfig.getValueAt(index, 1).toString());
-        }
-        return ret;
+        return cfgPanel.getConfig();
     }
 
     /**
@@ -125,19 +114,16 @@ public class ConfigDialog extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed"
     // <editor-fold defaultstate="collapsed"
     // <editor-fold defaultstate="collapsed"
+    // <editor-fold defaultstate="collapsed"
+    // <editor-fold defaultstate="collapsed"
     // desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        java.awt.GridBagConstraints gridBagConstraints;
 
         pnlBottom = new javax.swing.JPanel();
         okButton = new javax.swing.JButton();
         cancelButton = new javax.swing.JButton();
         pnlTop = new javax.swing.JPanel();
-        scrConfig = new javax.swing.JScrollPane();
-        tblConfig = new javax.swing.JTable();
-        pnlRight = new javax.swing.JPanel();
-        btnAdd = new javax.swing.JButton();
-        btnRemove = new javax.swing.JButton();
+        cfgPanel = new com.yosanai.java.swing.config.ConfigPanel();
 
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
@@ -166,59 +152,12 @@ public class ConfigDialog extends javax.swing.JDialog {
         getContentPane().add(pnlBottom, java.awt.BorderLayout.PAGE_END);
 
         pnlTop.setLayout(new java.awt.BorderLayout());
-
-        tblConfig.setModel(tableModel);
-        tblConfig.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        scrConfig.setViewportView(tblConfig);
-
-        pnlTop.add(scrConfig, java.awt.BorderLayout.CENTER);
+        pnlTop.add(cfgPanel, java.awt.BorderLayout.CENTER);
 
         getContentPane().add(pnlTop, java.awt.BorderLayout.CENTER);
 
-        pnlRight.setLayout(new java.awt.GridBagLayout());
-
-        btnAdd.setText("Add");
-        btnAdd.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnAddActionPerformed(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        pnlRight.add(btnAdd, gridBagConstraints);
-
-        btnRemove.setText("Remove");
-        btnRemove.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnRemoveActionPerformed(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        pnlRight.add(btnRemove, gridBagConstraints);
-
-        getContentPane().add(pnlRight, java.awt.BorderLayout.LINE_END);
-
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnAddActionPerformed
-        DefaultTableModel model = (DefaultTableModel) tblConfig.getModel();
-        model.addRow(new Object[] { "key", "value" });
-    }// GEN-LAST:event_btnAddActionPerformed
-
-    private void btnRemoveActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnRemoveActionPerformed
-        int row = tblConfig.getSelectedRow();
-        DefaultTableModel model = (DefaultTableModel) tblConfig.getModel();
-        if (-1 < row) {
-            model.removeRow(row);
-        }
-
-    }// GEN-LAST:event_btnRemoveActionPerformed
 
     /** Closes the dialog */
     private void closeDialog(java.awt.event.WindowEvent evt) {// GEN-FIRST:event_closeDialog
@@ -259,23 +198,15 @@ public class ConfigDialog extends javax.swing.JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnAdd;
-
-    private javax.swing.JButton btnRemove;
-
     private javax.swing.JButton cancelButton;
+
+    private com.yosanai.java.swing.config.ConfigPanel cfgPanel;
 
     private javax.swing.JButton okButton;
 
     private javax.swing.JPanel pnlBottom;
 
-    private javax.swing.JPanel pnlRight;
-
     private javax.swing.JPanel pnlTop;
-
-    private javax.swing.JScrollPane scrConfig;
-
-    private javax.swing.JTable tblConfig;
 
     // End of variables declaration//GEN-END:variables
 

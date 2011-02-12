@@ -1,4 +1,4 @@
-/**
+/*
  *
  * This is the MIT License
  * http://www.opensource.org/licenses/mit-license.php
